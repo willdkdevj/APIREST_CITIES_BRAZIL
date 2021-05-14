@@ -1,5 +1,6 @@
 package br.com.supernova.citiesbrazil.model;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -8,10 +9,7 @@ import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 import org.springframework.data.geo.Point;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity(name = "City")
 @Table(name = "cidade")
@@ -24,16 +22,24 @@ import javax.persistence.Table;
 public class City {
 
     @Id
+    @ApiModelProperty(notes = "Unique entity identifier", required = true)
     private Long id;
 
     @Column(name = "nome")
+    @ApiModelProperty(notes = "Unique value where it cannot be null", required = true)
     private String name;
 
+    // @ManyToOne
+    // @JoinColumn(name = "estado", referencedColumnName = "id")
+    // private State uf;
+    @ApiModelProperty(notes = "Unique value where it cannot be null", required = true)
     private Integer uf;
 
+    @ApiModelProperty(notes = "Unique value where it cannot be null", required = true)
     private Integer ibge;
 
     @Column(name = "lat_lon")
+    @ApiModelProperty(notes = "Unique value where it cannot be null", required = true)
     private String geolocation;
 
     @Type(type = "point")

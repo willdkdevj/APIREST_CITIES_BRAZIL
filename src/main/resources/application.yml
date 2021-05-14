@@ -1,5 +1,14 @@
 spring:
-	datasource:
-		url: jdbc:postgresql://localhost:5432/citiesBrazil
-		username: postgres_supernova_user
-		password: supernova_pass
+  application:
+    name: citiesbrazil
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/citiesBrazil
+    username: postgres_supernova_user
+    password: supernova_pass
+
+  jpa:
+    show-sql: true # Mostra o código SQL invocado
+    properties:
+      hibernate:
+        format_sql: true # Informa ao Hibernate para formatar o código SQL
