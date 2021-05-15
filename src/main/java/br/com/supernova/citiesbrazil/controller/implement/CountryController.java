@@ -1,4 +1,4 @@
-package br.com.supernova.citiesbrazil.controller;
+package br.com.supernova.citiesbrazil.controller.implement;
 
 import br.com.supernova.citiesbrazil.model.Country;
 import io.swagger.annotations.Api;
