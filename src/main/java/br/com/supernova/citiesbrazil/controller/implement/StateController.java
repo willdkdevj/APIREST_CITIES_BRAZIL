@@ -1,5 +1,6 @@
 package br.com.supernova.citiesbrazil.controller.implement;
 
+import br.com.supernova.citiesbrazil.exception.FederativeUnitNotFoundException;
 import br.com.supernova.citiesbrazil.model.State;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,13 +23,13 @@ public interface StateController {
             @ApiResponse(code = 200, message = "State found successfully"),
             @ApiResponse(code = 404, message = "Could not find state reported")
     })
-    Page searchStateByName(String name);
+    Page searchStateByName(String name) throws FederativeUnitNotFoundException;
 
     @ApiOperation(value = "Operation to locate state by Database ID")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "State found successfully"),
             @ApiResponse(code = 404, message = "Could not find state reported")
     })
-    Page searchStateByID(Long id);
+    Page searchStateByID(Long id) throws FederativeUnitNotFoundException;
 
 }

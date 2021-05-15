@@ -1,5 +1,6 @@
 package br.com.supernova.citiesbrazil.controller.implement;
 
+import br.com.supernova.citiesbrazil.exception.PatriarchateNotFoundException;
 import br.com.supernova.citiesbrazil.model.Country;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -22,13 +23,13 @@ public interface CountryController {
             @ApiResponse(code = 200, message = "Country found successfully"),
             @ApiResponse(code = 404, message = "Could not find country reported")
     })
-    Page searchCountryByName(String name);
+    Page searchCountryByName(String name) throws PatriarchateNotFoundException;
 
     @ApiOperation(value = "Operation to locate country by Database ID")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Country found successfully"),
             @ApiResponse(code = 404, message = "Could not find country reported")
     })
-    Page searchCountryByID(Long id);
+    Page searchCountryByID(Long id) throws PatriarchateNotFoundException;
 
 }
