@@ -16,7 +16,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @Configuration
 @EnableSwagger2
 public class SwaggerConfig {
-    private static final String API_TITLE = "Registering and Managing People Registration";
+    private static final String API_TITLE = "Catalog of Countries with Brazilian States and their respective cities";
     private static final String API_DESCRIPTION = "The REST API consists of a query tool for cities in Brazil, in addition to the creation of a service for calculating distance between cities";
     private static final String CONTACT_NAME = "William Derek Dias";
     private static final String CONTACT_GITHUB = "https://github.com/willdkdevj";
