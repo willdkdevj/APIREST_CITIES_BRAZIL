@@ -23,14 +23,14 @@ public interface CityController {
             @ApiResponse(code = 200, message = "City found successfully"),
             @ApiResponse(code = 404, message = "Could not find city reported")
     })
-    Page searchCityByName(String name) throws UrbeNotFoundException;
+    City searchCityByName(String name) throws UrbeNotFoundException;
 
     @ApiOperation(value = "Operation to locate state by Database ID")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "State found successfully"),
             @ApiResponse(code = 404, message = "Could not find state reported")
     })
-    Page searchCityByID(Long id) throws UrbeNotFoundException;
+    City searchCityByID(Long id) throws UrbeNotFoundException;
 
     @ApiOperation(value = "Operation to calculate the distance (in miles) between two location points")
     @ApiResponses(value = {

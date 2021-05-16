@@ -24,14 +24,14 @@ public class CityResources implements CityController {
 
     @Override
     @GetMapping("/city/{name}")
-    public Page searchCityByName(@PathVariable String name) {
-        return null; //serviceCity.returnCityName(name);
+    public City searchCityByName(@PathVariable String name) throws UrbeNotFoundException {
+        return serviceCity.returnCityName(name);
     }
 
     @Override
     @GetMapping("/city/{id}")
-    public Page searchCityByID(@PathVariable Long id) {
-        return null; //serviceCity.returnCityID(id);
+    public City searchCityByID(@PathVariable Long id) throws UrbeNotFoundException {
+        return serviceCity.returnCityID(id);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class CityResources implements CityController {
     @Override
     @GetMapping("/cities/distance-in-meters")
     public Page calculateInMeters(@RequestParam(name = "from") final String city1,
-                                  @RequestParam(name = "to") String city2) throws UrbeNotFoundException {
+                                  @RequestParam(name = "to") final String city2) throws UrbeNotFoundException {
         return null; // serviceCity.distanceByLocationInMeters(city1, city2);
     }
 }
