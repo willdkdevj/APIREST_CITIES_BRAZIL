@@ -23,13 +23,13 @@ public interface StateController {
             @ApiResponse(code = 200, message = "State found successfully"),
             @ApiResponse(code = 404, message = "Could not find state reported")
     })
-    Page searchStateByName(String name) throws FederativeUnitNotFoundException;
+    State searchStateByName(String name) throws FederativeUnitNotFoundException;
 
     @ApiOperation(value = "Operation to locate state by Database ID")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "State found successfully"),
             @ApiResponse(code = 404, message = "Could not find state reported")
     })
-    Page searchStateByID(Long id) throws FederativeUnitNotFoundException;
+    State searchStateByID(Long id) throws FederativeUnitNotFoundException;
 
 }

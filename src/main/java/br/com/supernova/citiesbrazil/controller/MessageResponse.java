@@ -1,4 +1,4 @@
-package br.com.supernova.citiesbrazil.controller.implement;
+package br.com.supernova.citiesbrazil.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

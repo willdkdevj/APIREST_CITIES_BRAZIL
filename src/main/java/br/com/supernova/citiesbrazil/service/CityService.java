@@ -1,6 +1,6 @@
 package br.com.supernova.citiesbrazil.service;
 
-import br.com.supernova.citiesbrazil.controller.implement.MessageResponse;
+import br.com.supernova.citiesbrazil.controller.MessageResponse;
 import br.com.supernova.citiesbrazil.enums.EarthRadius;
 import br.com.supernova.citiesbrazil.exception.UrbeNotFoundException;
 import br.com.supernova.citiesbrazil.model.City;
@@ -14,7 +14,11 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.List;
 
-import static java.lang.Math.*;
+import static java.lang.Math.atan2;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+import static java.lang.Math.sqrt;
+import static java.lang.Math.toRadians;
 
 @Service
 @RequiredArgsConstructor

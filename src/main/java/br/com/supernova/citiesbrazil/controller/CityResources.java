@@ -1,7 +1,6 @@
 package br.com.supernova.citiesbrazil.controller;
 
 import br.com.supernova.citiesbrazil.controller.implement.CityController;
-import br.com.supernova.citiesbrazil.controller.implement.MessageResponse;
 import br.com.supernova.citiesbrazil.enums.EarthRadius;
 import br.com.supernova.citiesbrazil.exception.UrbeNotFoundException;
 import br.com.supernova.citiesbrazil.model.City;
@@ -57,7 +56,4 @@ public class CityResources implements CityController {
                                                    @RequestParam(name = "to") final String city2) throws UrbeNotFoundException {
         return serviceCity.distanceInMetersPostgre(city1, city2);
     }
-
-
-
 }
