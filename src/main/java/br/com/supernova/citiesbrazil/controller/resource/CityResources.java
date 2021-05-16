@@ -1,6 +1,7 @@
-package br.com.supernova.citiesbrazil.controller;
+package br.com.supernova.citiesbrazil.controller.resource;
 
 import br.com.supernova.citiesbrazil.controller.implement.CityController;
+import br.com.supernova.citiesbrazil.controller.response.MessageResponse;
 import br.com.supernova.citiesbrazil.enums.EarthRadius;
 import br.com.supernova.citiesbrazil.exception.UrbeNotFoundException;
 import br.com.supernova.citiesbrazil.model.City;

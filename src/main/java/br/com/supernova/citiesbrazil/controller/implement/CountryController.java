@@ -23,13 +23,13 @@ public interface CountryController {
             @ApiResponse(code = 200, message = "Country found successfully"),
             @ApiResponse(code = 404, message = "Could not find country reported")
     })
-    Page searchCountryByName(String name) throws PatriarchateNotFoundException;
+    Country searchCountryByName(String name) throws PatriarchateNotFoundException;
 
     @ApiOperation(value = "Operation to locate country by Database ID")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Country found successfully"),
             @ApiResponse(code = 404, message = "Could not find country reported")
     })
-    Page searchCountryByID(Long id) throws PatriarchateNotFoundException;
+    Country searchCountryByID(Long id) throws PatriarchateNotFoundException;
 
 }

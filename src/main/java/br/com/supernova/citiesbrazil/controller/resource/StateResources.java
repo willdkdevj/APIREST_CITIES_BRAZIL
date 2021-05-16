@@ -1,4 +1,4 @@
-package br.com.supernova.citiesbrazil.controller;
+package br.com.supernova.citiesbrazil.controller.resource;
 
 import br.com.supernova.citiesbrazil.controller.implement.StateController;
 import br.com.supernova.citiesbrazil.exception.FederativeUnitNotFoundException;
