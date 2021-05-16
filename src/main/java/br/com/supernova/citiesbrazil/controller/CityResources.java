@@ -1,6 +1,8 @@
 package br.com.supernova.citiesbrazil.controller;
 
 import br.com.supernova.citiesbrazil.controller.implement.CityController;
+import br.com.supernova.citiesbrazil.controller.implement.MessageResponse;
+import br.com.supernova.citiesbrazil.enums.EarthRadius;
 import br.com.supernova.citiesbrazil.exception.UrbeNotFoundException;
 import br.com.supernova.citiesbrazil.model.City;
 import br.com.supernova.citiesbrazil.service.CityService;
@@ -23,28 +25,39 @@ public class CityResources implements CityController {
     }
 
     @Override
-    @GetMapping("/city/{name}")
-    public City searchCityByName(@PathVariable String name) throws UrbeNotFoundException {
+    @GetMapping("/city-by-name/{name}")
+    public City searchCityByName(@PathVariable final String name) throws UrbeNotFoundException {
         return serviceCity.returnCityName(name);
     }
 
     @Override
-    @GetMapping("/city/{id}")
-    public City searchCityByID(@PathVariable Long id) throws UrbeNotFoundException {
+    @GetMapping("/city-by-id/{id}")
+    public City searchCityByID(@PathVariable final Long id) throws UrbeNotFoundException {
         return serviceCity.returnCityID(id);
     }
 
     @Override
+    @GetMapping("/cities/distance-calculation")
+    public MessageResponse calculateInMiles(@RequestParam(name = "from") final String city1,
+                                            @RequestParam(name = "to") final String city2,
+                                            @RequestParam(name = "radius") final EarthRadius radius) throws UrbeNotFoundException {
+        return serviceCity.distanceByLocationByRadius(city1, city2, radius);
+    }
+
+    @Override
     @GetMapping("/cities/distance-in-miles")
-    public Page calculateInMiles(@RequestParam(name = "from") final String city1,
-                                 @RequestParam(name = "to") final String city2) throws UrbeNotFoundException {
-        return null; //serviceCity.distanceByLocationInMiles(city1, city2);
+    public MessageResponse distanceInMilesPostgre(@RequestParam(name = "from") final String city1,
+                                                  @RequestParam(name = "to") final String city2) throws UrbeNotFoundException {
+        return serviceCity.distanceByLocationInMilesPostgre(city1, city2);
     }
 
     @Override
     @GetMapping("/cities/distance-in-meters")
-    public Page calculateInMeters(@RequestParam(name = "from") final String city1,
-                                  @RequestParam(name = "to") final String city2) throws UrbeNotFoundException {
-        return null; // serviceCity.distanceByLocationInMeters(city1, city2);
+    public MessageResponse distanceInMetersPostgre(@RequestParam(name = "from") final String city1,
+                                                   @RequestParam(name = "to") final String city2) throws UrbeNotFoundException {
+        return serviceCity.distanceInMetersPostgre(city1, city2);
     }
+
+
+
 }

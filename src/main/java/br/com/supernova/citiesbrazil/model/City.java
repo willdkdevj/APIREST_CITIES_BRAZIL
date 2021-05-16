@@ -29,11 +29,10 @@ public class City {
     @ApiModelProperty(notes = "Unique value where it cannot be null", required = true)
     private String name;
 
-    // @ManyToOne
-    // @JoinColumn(name = "estado", referencedColumnName = "id")
-    // private State uf;
+    @ManyToOne
+    @JoinColumn(name = "uf", referencedColumnName = "id")
     @ApiModelProperty(notes = "Unique value where it cannot be null", required = true)
-    private Integer uf;
+    private State state;
 
     @ApiModelProperty(notes = "Unique value where it cannot be null", required = true)
     private Integer ibge;

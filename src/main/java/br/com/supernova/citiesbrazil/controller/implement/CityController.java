@@ -1,5 +1,6 @@
 package br.com.supernova.citiesbrazil.controller.implement;
 
+import br.com.supernova.citiesbrazil.enums.EarthRadius;
 import br.com.supernova.citiesbrazil.exception.UrbeNotFoundException;
 import br.com.supernova.citiesbrazil.model.City;
 import io.swagger.annotations.Api;
@@ -32,17 +33,25 @@ public interface CityController {
     })
     City searchCityByID(Long id) throws UrbeNotFoundException;
 
-    @ApiOperation(value = "Operation to calculate the distance (in miles) between two location points")
+    @ApiOperation(value = "Operation to calculate the distance informing the type of return (Meters, Kilometers, Miles) by the radius of the earth determining two points for location")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Location Points returned successfully"),
             @ApiResponse(code = 404, message = "It was not possible to return the location with the parameters provided")
     })
-    Page calculateInMiles(String city1, String city2) throws UrbeNotFoundException;
+    MessageResponse calculateInMiles(String city1, String city2, EarthRadius earthRadius) throws UrbeNotFoundException;
 
-    @ApiOperation(value = "Operation to calculate the distance (in meters) between two location points")
+    @ApiOperation(value = "Operation using PostgreSQL's CUBE function that returns the distance (in miles) between two location points")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Location Points returned successfully"),
             @ApiResponse(code = 404, message = "It was not possible to return the location with the parameters provided")
     })
-    Page calculateInMeters(String city1, String city2) throws UrbeNotFoundException;
+    MessageResponse distanceInMilesPostgre(String city1, String city2) throws UrbeNotFoundException;
+
+    @ApiOperation(value = "Operation using PostgreSQL's CUBE function that returns the distance (in meters) between two location points")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Location Points returned successfully"),
+            @ApiResponse(code = 404, message = "It was not possible to return the location with the parameters provided")
+    })
+    MessageResponse distanceInMetersPostgre(String city1, String city2) throws UrbeNotFoundException;
+
 }
