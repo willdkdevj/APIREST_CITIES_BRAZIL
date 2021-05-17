@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 
 @Api("Interface for the Control of Countries Management")
 public interface CountryController {
@@ -23,13 +24,13 @@ public interface CountryController {
             @ApiResponse(code = 200, message = "Country found successfully"),
             @ApiResponse(code = 404, message = "Could not find country reported")
     })
-    Country searchCountryByName(String name) throws PatriarchateNotFoundException;
+    ResponseEntity<Country> searchCountryByName(String name) throws PatriarchateNotFoundException;
 
     @ApiOperation(value = "Operation to locate country by Database ID")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Country found successfully"),
             @ApiResponse(code = 404, message = "Could not find country reported")
     })
-    Country searchCountryByID(Long id) throws PatriarchateNotFoundException;
+    ResponseEntity<Country> searchCountryByID(Long id) throws PatriarchateNotFoundException;
 
 }

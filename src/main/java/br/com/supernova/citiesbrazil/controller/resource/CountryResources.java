@@ -8,6 +8,7 @@ import br.com.supernova.citiesbrazil.service.CountryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,13 +29,13 @@ public class CountryResources implements CountryController {
 
     @Override
     @GetMapping("/country-by-name/{name}")
-    public Country searchCountryByName(@PathVariable String name) throws PatriarchateNotFoundException {
+    public ResponseEntity<Country> searchCountryByName(@PathVariable String name) throws PatriarchateNotFoundException {
         return serviceCountry.returnCountryName(name);
     }
 
     @Override
     @GetMapping("/country-by-id/{id}")
-    public Country searchCountryByID(@PathVariable Long id) throws PatriarchateNotFoundException {
+    public ResponseEntity<Country> searchCountryByID(@PathVariable Long id) throws PatriarchateNotFoundException {
         return serviceCountry.returnCountryID(id);
     }
 }

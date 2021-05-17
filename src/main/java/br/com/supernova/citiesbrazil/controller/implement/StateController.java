@@ -8,6 +8,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 
 @Api("Interface for the Control of Brazilian States Management")
 public interface StateController {
@@ -23,13 +24,13 @@ public interface StateController {
             @ApiResponse(code = 200, message = "State found successfully"),
             @ApiResponse(code = 404, message = "Could not find state reported")
     })
-    State searchStateByName(String name) throws FederativeUnitNotFoundException;
+    ResponseEntity<State> searchStateByName(String name) throws FederativeUnitNotFoundException;
 
     @ApiOperation(value = "Operation to locate state by Database ID")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "State found successfully"),
             @ApiResponse(code = 404, message = "Could not find state reported")
     })
-    State searchStateByID(Long id) throws FederativeUnitNotFoundException;
+    ResponseEntity<State> searchStateByID(Long id) throws FederativeUnitNotFoundException;
 
 }

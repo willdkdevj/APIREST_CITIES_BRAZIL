@@ -6,6 +6,7 @@ import br.com.supernova.citiesbrazil.repository.CountryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,15 +19,21 @@ public class CountryService {
         return repository.findAll(page);
     }
 
-    public Country returnCountryName(String name) throws PatriarchateNotFoundException {
-        return repository.findByName(name).orElseThrow(
-                () -> new PatriarchateNotFoundException(name)
-        );
+    public ResponseEntity<Country> returnCountryName(String name) throws PatriarchateNotFoundException {
+        Country country = checkedCountryByName(name);
+        return ResponseEntity.ok(country);
     }
 
-    public Country returnCountryID(Long id) throws PatriarchateNotFoundException {
-        return repository.findById(id).orElseThrow(
+    public ResponseEntity<Country> returnCountryID(Long id) throws PatriarchateNotFoundException {
+        Country country = repository.findById(id).orElseThrow(
                 () -> new PatriarchateNotFoundException(id)
+        );
+        return ResponseEntity.ok(country);
+    }
+
+    private Country checkedCountryByName(String nameCountry) throws PatriarchateNotFoundException {
+        return repository.findByName(nameCountry).orElseThrow(
+                () -> new PatriarchateNotFoundException(nameCountry)
         );
     }
 }

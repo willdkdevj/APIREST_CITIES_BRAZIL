@@ -6,6 +6,7 @@ import br.com.supernova.citiesbrazil.repository.StateRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,15 +19,23 @@ public class StateService {
         return repository.findAll(page);
     }
 
-    public State returnStateName(String name) throws FederativeUnitNotFoundException {
-        return repository.findByName(name).orElseThrow(
+    public ResponseEntity<State> returnStateName(String name) throws FederativeUnitNotFoundException {
+        State state = repository.findByName(name).orElseThrow(
                 () -> new FederativeUnitNotFoundException(name)
         );
+        return ResponseEntity.ok(state);
     }
 
-    public State returnStateID(Long id) throws FederativeUnitNotFoundException {
-        return repository.findById(id).orElseThrow(
+    public ResponseEntity<State> returnStateID(Long id) throws FederativeUnitNotFoundException {
+        State state = repository.findById(id).orElseThrow(
                 () -> new FederativeUnitNotFoundException(id)
+        );
+        return ResponseEntity.ok(state);
+    }
+
+    private State checkedStateByName(String nameState) throws FederativeUnitNotFoundException {
+        return repository.findByName(nameState).orElseThrow(
+                () -> new FederativeUnitNotFoundException(nameState)
         );
     }
 }
