@@ -9,6 +9,7 @@ import br.com.supernova.citiesbrazil.service.CityService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,13 +27,13 @@ public class CityResources implements CityController {
 
     @Override
     @GetMapping("/city-by-name/{name}")
-    public City searchCityByName(@PathVariable final String name) throws UrbeNotFoundException {
+    public ResponseEntity<City> searchCityByName(@PathVariable final String name) throws UrbeNotFoundException {
         return serviceCity.returnCityName(name);
     }
 
     @Override
     @GetMapping("/city-by-id/{id}")
-    public City searchCityByID(@PathVariable final Long id) throws UrbeNotFoundException {
+    public ResponseEntity<City> searchCityByID(@PathVariable final Long id) throws UrbeNotFoundException {
         return serviceCity.returnCityID(id);
     }
 

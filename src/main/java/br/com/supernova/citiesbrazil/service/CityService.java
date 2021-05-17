@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.geo.Point;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -30,22 +31,22 @@ public class CityService {
         return repository.findAll(page);
     }
 
-    public City returnCityName(String name) throws UrbeNotFoundException {
-        return repository.findByName(name).orElseThrow(
-                () -> new UrbeNotFoundException(name)
-        );        
+    public ResponseEntity<City> returnCityName(String name) throws UrbeNotFoundException {
+        City city = checkedCityByName(name);
+        return ResponseEntity.ok(city);
     }
 
-    public City returnCityID(Long id) throws UrbeNotFoundException {
-        return repository.findById(id).orElseThrow(
+    public ResponseEntity<City> returnCityID(Long id) throws UrbeNotFoundException {
+        City city = repository.findById(id).orElseThrow(
                 () -> new UrbeNotFoundException(id)
         );
+        return ResponseEntity.ok(city);
     }
 
     public MessageResponse distanceByLocationByRadius(String city1, String city2, EarthRadius radius)
             throws UrbeNotFoundException {
-        City foundCity1 = returnCityName(city1);
-        City foundCity2 = returnCityName(city2);
+        City foundCity1 = checkedCityByName(city1);
+        City foundCity2 = checkedCityByName(city2);
 
         List<City> cities = repository.findAllById(Arrays.asList(foundCity1.getId(),
                                                                  foundCity2.getId()));
@@ -65,8 +66,8 @@ public class CityService {
     }
 
     public MessageResponse distanceByLocationInMilesPostgre(String city1, String city2) throws UrbeNotFoundException {
-        City foundCity1 = returnCityName(city1);
-        City foundCity2 = returnCityName(city2);
+        City foundCity1 = checkedCityByName(city1);
+        City foundCity2 = checkedCityByName(city2);
 
         Double obtainedDistance = repository.distanceByPoints(foundCity1.getId(), foundCity2.getId());
 
@@ -74,8 +75,8 @@ public class CityService {
     }
 
     public MessageResponse distanceInMetersPostgre(String city1, String city2) throws UrbeNotFoundException {
-        City foundCity1 = returnCityName(city1);
-        City foundCity2 = returnCityName(city2);
+        City foundCity1 = checkedCityByName(city1);
+        City foundCity2 = checkedCityByName(city2);
 
         Point point1 = foundCity1.getLocation();
         Point point2 = foundCity2.getLocation();
@@ -108,5 +109,11 @@ public class CityService {
         Double factor = 2 * atan2(sqrt(obtainedArea), sqrt(1 - obtainedArea));
 
         return radius.getValue() * factor;
+    }
+
+    private City checkedCityByName(String nameCity) throws UrbeNotFoundException {
+        return repository.findByName(nameCity).orElseThrow(
+                () -> new UrbeNotFoundException(nameCity)
+        );
     }
 }

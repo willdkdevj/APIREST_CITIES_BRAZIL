@@ -10,6 +10,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 
 @Api("Interface for the Control of Brazilian Cities Management")
 public interface CityController {
@@ -25,14 +26,14 @@ public interface CityController {
             @ApiResponse(code = 200, message = "City found successfully"),
             @ApiResponse(code = 404, message = "Could not find city reported")
     })
-    City searchCityByName(String name) throws UrbeNotFoundException;
+    ResponseEntity<City> searchCityByName(String name) throws UrbeNotFoundException;
 
     @ApiOperation(value = "Operation to locate state by Database ID")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "State found successfully"),
             @ApiResponse(code = 404, message = "Could not find state reported")
     })
-    City searchCityByID(Long id) throws UrbeNotFoundException;
+    ResponseEntity<City> searchCityByID(Long id) throws UrbeNotFoundException;
 
     @ApiOperation(value = "Operation to calculate the distance informing the type of return (Meters, Kilometers, Miles) by the radius of the earth determining two points for location")
     @ApiResponses(value = {

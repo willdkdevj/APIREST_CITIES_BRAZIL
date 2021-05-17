@@ -22,10 +22,10 @@ Os frameworks são pacotes de códigos prontos que facilita o desenvolvimento de
 **Pré-Requisito**: Java 11 (11.0.10 2021-01-19 LTS)
 			   Maven 3.6.3
 
-| Framework       | Versão |
-|-----------------|:------:|
-| Spring Boot     | 2.4.4  |
-| Spring Actuator | 2.4.4  |
+| Framework       | Versão | Função |
+|-----------------|:------:|--------|
+| Spring Boot     | 2.4.4  | Permite agilizar o processo de configuração e publicação de aplicações do ecossistema Spring |
+| Spring Actuator | 2.4.4  | 
 | Spring Data JPA | 2.4.4  |
 | Hibernate       | 6.1.7  |
 | Lombok          | 1.18.18|
@@ -48,7 +48,7 @@ Os testes unitários são utilizados para testar a menor unidade do projeto de s
 
 Toda esta dinâmica é possível através do framework JUnit, que possibilita a criação de classes de testes que contêm métodos de verificação das lógicas presentes aos mêtodos que das classes devem ser expostos em "produção", permitindo organizá-los de forma hierárquica, seradados ou até mesmo todos de uma vez. O objetivo desta abordagem é evitar códigos desnecessários e a duplicidade obtendo um código funcional e testado contra falhas agregando substancialmente mais qualidade.
 
-### Exemplo do Uso do TDD para Construção da Lógica dos Métodos
+### Utilizando o Pageable para Paginação de Grandes Volumes de Dados
 O Junit utiliza-se de anotações (Annotations) para indicar se o método é de teste ou não, se o método deve ser executado antes ou depois de um determinado código, se o teste deve ou não ser ignorado, se a classe em questão é uma suite de teste, entre diversas outras funcionalidades que o framework nos permite configurar.
 
 Para realização dos testes utilizaremos a versão 5 do JUnit, para isto foi informado no **pom.xml** para excluir a versão 4 que automamente ele assume a versão posterior para o projeto.
@@ -69,7 +69,7 @@ Para realização dos testes utilizaremos a versão 5 do JUnit, para isto foi in
 
 Esta versão contém os novos recursos para construção de testes usando o JUnit, fornecendo uma implementação de ``TestEngine`` para execução dos testes, onde a classe [Assert] com seus métodos de verificação foram substituídos pela classe [Assertions] que possuí implementações dos métodos de verificação, mais com uma semântica mais refinada.
 
-### A Implementação dos Testes na Classe Service
+### Habilitando Extensões para Uso de Funções do PostgreSQL para Geolocalização
 Para demonstrar como foi realizado o uso do conceito TDD com o framework abaixo vou apresentar o que foi realizado para construção do método registerPerson() na classe de ``Service`` MVC. Mas conforme foi explanado anteriormente, foi necessário criar objetos para simular as classes em entidades com dados estáticos para emular entradas de informações aos objetos com classes construtoras (*builders*), que se trata de classes com valores estáticos para seus atributos, seguindo os conceitos do DTO. E para realizar esta conversão de uma classe DTO em uma entidade, foi utilizado o framework ``MapStruct``. Ele simplifica o mapeamento de objetos DTO para objetos de Entidade permitindo gerar código com base em uma abordagem de conversão utilizando uma interface.
 
 Para realizar esta abordagem é utilizada a anotação @Mapper na interface que mapeia quais são os objetos a serem convertidos atraves da sobreescritas de seus métodos.
