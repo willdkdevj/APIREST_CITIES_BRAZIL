@@ -18,6 +18,6 @@ public class ResourceAdvice {
             UrbeNotFoundException.class
     })
     public void notFound(){
-        
+
     }
 }

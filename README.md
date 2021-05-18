@@ -10,64 +10,65 @@
 <img align="right" width="400" height="300" src="https://github.com/willdkdevj/assets/blob/main/Spring/spring-framework.png">
 
 ## Descrição da Aplicação
-A aplicação consiste em uma API (*Application Programming Interface*) REST (*Representational State Transfer*), sendo aplicado o modelo cliente/servidor na qual tem a função de enviar e receber dados através do protocolo HTTP, sendo o seu principal objetivo permitir a interoperabilidade entre aplicações distintas. Esta aplicação emula um serviço web que interage com um serviço de banco de dados a fim de consultar registro sobre países, estados, e cidades. Quanto a consulta a estados e cidades são disponíveis somente os registros do Brasil, além disso, é possível realizar cálculos de distância entre dois parâmetros de localização, neste caso, entre duas cidades para obter a distância entre ambos.
+A aplicação consiste em uma API (*Application Programming Interface*) REST (*Representational State Transfer*), sendo aplicado o modelo cliente/servidor na qual tem a função de enviar e receber dados através do protocolo HTTP, sendo o seu principal objetivo permitir a interoperabilidade entre aplicações distintas. Mas nesta aplicação, o intuito é emula um serviço web que interage com um serviço de banco de dados a fim de consultar registro sobre países, estados, e cidades. Quanto a consulta a estados e a cidades, estão disponíveis apenas os registros do Brasil. Além disso, é possível realizar cálculos de distância entre dois parâmetros de localização, neste caso, entre duas cidades para obter a distância entre ambos.
 
-Estes cálculos são disponíveis através de dois modos, o primeiro é habilitando extensões que fornecem funções para tal utilizando o SGBD PostgreSQL, o segundo foi a partir do desenvolvimento de métodos que recebem o diâmetro do planeta Terra e realiza o cálculo através da passagem de Pontos de Localização, possível ao implementar a classe Point do springframework.
+Referente a consulta, como ela pode retornar um volume considerável de registros é utilizado o recurso de paginação a fim de obter um ganho de performance ao obter e na apresentação dos dados. Já os cálculos estão disponíveis por meio de dois modelos, o primeiro é habilitado através de extensões disponíves através do SGBD PostgreSQL, que fornecem funções que automatizam o cálculo, já o segundo, foi a partir do desenvolvimento de métodos que recebem o diâmetro do planeta Terra e realiza o cálculo através da passagem de Pontos de Localização, possível ao implementar a classe Point do springframework.
 
 No decorrer deste documento é apresentado com mais detalhes sua implementação, descrevendo como foi desenvolvida a estrutura da API, suas dependências e como foi colocado em prática a implementação dos cálculos e listagem por paginação. Além disso, como foi implementado o Spring Boot, para agilizar a construção do código e sua configuração, conforme os *starters* e as suas dependências. Bem como, o Spring Data JPA, que nos dá diversas funcionalidades permitindo uma melhor dinâmica nas operações com bancos de dados e sua manutenção. Até o seu deploy na plataforma Heroku para disponibilizá-la pela nuvem ao cliente.
 
 ## Principais Frameworks
 Os frameworks são pacotes de códigos prontos que facilita o desenvolvimento de aplicações, desta forma, utilizamos estes para obter funcionalidades para agilizar a construção da aplicação. Abaixo segue os frameworks utilizados para o desenvolvimento este projeto:
 
-**Pré-Requisito**: Java 11 (11.0.10 2021-01-19 LTS)
-			   Maven 3.6.3
+**Pré-Requisito**: Java 11 (11.0.10 2021-01-19 LTS) / Maven 3.6.3 / Docker 20 (20.10.6 build 370c289)
 
-| Framework       | Versão | Função |
-|-----------------|:------:|--------|
-| Spring Boot     | 2.4.4  | Permite agilizar o processo de configuração e publicação de aplicações do ecossistema Spring |
-| Spring Actuator | 2.4.4  | 
-| Spring Data JPA | 2.4.4  |
-| Hibernate       | 6.1.7  |
-| Lombok          | 1.18.18|
-| MapStruct       | 1.4.1  |
-| JUnit 	      | 5.7.1  |
-| Mockito         | 3.6.28 |
-| Swagger         | 2.9.2  |
+| Framework       | Versão | Função                                                                                            |
+|-----------------|:------:|---------------------------------------------------------------------------------------------------|
+| Spring Boot     | 2.4.4  | Permite agilizar o processo de configuração e publicação de aplicações do ecossistema Spring      |
+| Spring Actuator | 2.4.4  | Fornece endpoints que permite verificar o estado da aplicação através de métricas                 |
+| Spring Data JPA | 2.4.4  | Facilita na interação com database permitindo uma fluídez na persistência dos dados de modo geral |
+| Hibernate       | 6.1.7  | Permite automatizar as tarefas com o banco de dados facilitando o código da aplicação             |
+| Lombok          | 1.18.18| Permite reduzir a verbosidade do código através de anotações                                      |
+| MapStruct       | 1.4.1  | Permite o mapeamento entre bean Java com base de uma abordagem de conversão sobre configuração    |
+| JUnit 	      | 5.7.1  | Permite a realização de testes unitários de componentes da aplicação Java                         |
+| Mockito         | 3.6.28 | Permite criar objetos dublês a fim de realizar testes de unidade em aplicações Java               |
+| Swagger         | 2.9.2  | Possibilita a definição e a criação de modo estruturado a documentação de API REST                | 
+
+### Utilizando Docker para Disponibilizar o PostgreSQL
 
 
-## Sobre a Estrutura da API REST utilizando o TDD na Construção
-Durante o desenvolvimento é essencial garantir que a API funcione corretamente, desta forma, é de vital importância testá-la para corrigir possíveis problemas antes de chegar ao usuário final. Desta forma, utilizando o conceito de Desenvolvimento Orientado a Testes (Test Driven Development - TDD) foi aplicado o conceito de ciclos de testes a fim de criar testes, fazê-los passar de alguma forma e refatorá-los a fim de melhorar sua legibilidade, para desta forma, construir as funcionalidades lógicas necessárias para automação do processo.
+## Utilizando o Pageable para Paginação de Grandes Volumes de Dados
+A paginação é utilizida ao realizar uma requisição de consulta a um grande volume de dados, ela possibilita filtrar a quantidade de registros que serão retornados informando mais parâmetros que funcionam como filtros especificos para a *Query*. Desta forma, é possível restringir a quantidade de registros que serão apresentados por intervalo de páginas. É possível realizar estes "filtros" na própria query, mas a paginação permite que seja passado como parâmetro da própria **URI** utilizando os recursos do Spring Data, através da dependência ``spring-boot-starter-data-jpa``.
 
-![Life Of Cicle - TDD](https://github.com/willdkdevj/assets/blob/main/Metodology/tdd_cicle.gif)
-
-Os testes foram realizados unitariamente aos Recursos, que identificam de modo único os objetos através da URI definidos no *Controller*, e aos Métodos, que são as lógicas de negócios definidos no *Service*, utilizada para obter os dados necessários da camada de dados. Para este fim, foram criadas Entidades Construtoras que simulam as Entidades que representam um objeto *Model* da camada de dados, isto é possível graças ao ao framework do Lombok com a anotação @Builder.
-
-![Framework Project - Test](https://github.com/willdkdevj/assets/blob/main/Spring/framework_test_person.png)
-
-Os testes unitários são utilizados para testar a menor unidade do projeto de software de modo isolado, seguindo a mesma lógica e com uso de dados similares que seriam utilizados na produção para testar a unidade em questão, que no caso, são os métodos das classes Controller e Service do modelo MVC.
-
-Toda esta dinâmica é possível através do framework JUnit, que possibilita a criação de classes de testes que contêm métodos de verificação das lógicas presentes aos mêtodos que das classes devem ser expostos em "produção", permitindo organizá-los de forma hierárquica, seradados ou até mesmo todos de uma vez. O objetivo desta abordagem é evitar códigos desnecessários e a duplicidade obtendo um código funcional e testado contra falhas agregando substancialmente mais qualidade.
-
-### Utilizando o Pageable para Paginação de Grandes Volumes de Dados
-O Junit utiliza-se de anotações (Annotations) para indicar se o método é de teste ou não, se o método deve ser executado antes ou depois de um determinado código, se o teste deve ou não ser ignorado, se a classe em questão é uma suite de teste, entre diversas outras funcionalidades que o framework nos permite configurar.
-
-Para realização dos testes utilizaremos a versão 5 do JUnit, para isto foi informado no **pom.xml** para excluir a versão 4 que automamente ele assume a versão posterior para o projeto.
-
-```xml
-<dependency>
-	<groupId>org.springframework.boot</groupId>
-	<artifactId>spring-boot-starter-test</artifactId>
-	<scope>test</scope>
-	<exclusions>
-		<exclusion>
-			<groupId>org.junit.vintage</groupId>
-			<artifactId>junit-vintage-engine</artifactId>
-		</exclusion>
-	</exclusions>
-</dependency>
+Agora, se faz necessário que a interface *Repository* extenda a também interface JpaRepository. Pois a interface JpaRepository também extende a **PagingAndSortingRepository**, sendo ela que possibilita interpretar o **Pageable** recebido por parâmetro através de um *Resource* utilizando o tipo de requisição GET, desta forma, utilizando as vantagens do fator de multi-herança.
+```java
+@GetMapping("/users")
+public ResponseEntity execute(Pageable page){
+    return ResponseEntity.ok(service.execute(page));
+}
 ```
 
-Esta versão contém os novos recursos para construção de testes usando o JUnit, fornecendo uma implementação de ``TestEngine`` para execução dos testes, onde a classe [Assert] com seus métodos de verificação foram substituídos pela classe [Assertions] que possuí implementações dos métodos de verificação, mais com uma semântica mais refinada.
+Também é possível passar parâmetros padrões (*default*) a fim de serem aplicados assim que o *resouce* é invocado, ao utilizar a anotação **@PageableDefault**. Para isso, se faz necessário passar alguns atributos para sua validação, são eles:
+* **Page** - identifica qual a página a ser retornada de uma lista;
+* **Size** - identifica a quantidade de registros a serem apresentados na página;
+* **Sort** - define a ordenação dos registros através do nome do campo;
+* **Direction** - define o tipo de ordenação a ser aplicada a paginação (Crescente (ASC) / Decrescente (DESC)).
+```java
+@GetMapping("/users")
+  public ResponseEntity execute(
+         @PageableDefault(sort = "name",
+                 direction = Sort.Direction.ASC,
+                 page = 0,
+                 size = 10) Pageable page){
+
+      return ResponseEntity.ok(service.execute(page));
+  }
+```
+
+Assim como, direto na **URI** conforme é apresentado na imagem, através da ferramenta Insomnia que apresenta uma requisição do tipo GET.
+
+![Request GET - ListAll](https://github.com/willdkdevj/assets/blob/main/Heroku/deploy_heroku_person.png)
+
+## Utilizando Cálculos para Retornar a Distância entre Dois Pontos
 
 ### Habilitando Extensões para Uso de Funções do PostgreSQL para Geolocalização
 Para demonstrar como foi realizado o uso do conceito TDD com o framework abaixo vou apresentar o que foi realizado para construção do método registerPerson() na classe de ``Service`` MVC. Mas conforme foi explanado anteriormente, foi necessário criar objetos para simular as classes em entidades com dados estáticos para emular entradas de informações aos objetos com classes construtoras (*builders*), que se trata de classes com valores estáticos para seus atributos, seguindo os conceitos do DTO. E para realizar esta conversão de uma classe DTO em uma entidade, foi utilizado o framework ``MapStruct``. Ele simplifica o mapeamento de objetos DTO para objetos de Entidade permitindo gerar código com base em uma abordagem de conversão utilizando uma interface.
@@ -131,57 +132,7 @@ Desta forma, em ``given`` é o que parâmetro fornecido ao método, que recebe u
 Este processo de verificação é realizado para testar os returnos esperados pela aplicação, assim como, as eventuais exceções a serem tratadas para devolutiva ao usuário.  
 
 ### A Implementação dos Testes na Classe Controller
-O processo no ``Controller`` é bem similar, na qual também é anotada a classe de teste com a anotação @ExtendWith(MockitoExtension.class) a fim de permitir *mocar* objetos em nossa classe através das anotações @Mock e @InjectMocks. O diferencial é a declaração da classe MockMvc com o objetivo de validar os *endpoints*.
 
-```java
-@ExtendWith(MockitoExtension.class)
-public class PersonControllerTest {
-
-    private static final String URL_PATH = "/api/v1/people";
-
-    private MockMvc mockMvc;
-
-    @InjectMocks
-    private PersonControllerImpl controller;
-
-    @Mock
-    private PersonService service;
-```
-
-O [MockMvc] permite automatizar o processo de verificação dos endpoints ao invocar e checar o retorno das requisições conforme o tipo de dado esperado. Desta forma, utilizamos a anotação @BeforeEach para que seja instanciado um objeto **Controller**, passando este objeto como parâmetro para contrução de um *setup* MockMvc, assim como, o tipo de retorno a ser apresentado pela *view*. Desta forma, cada método que realizará o teste utilizará um objeto MockMvc com a estrutura de dados a ser validado conforme o ``endpoint`` a ser testado.
-
-```java
-@BeforeEach
-void setUp() {
-    controller = new PersonControllerImpl(service);
-    mockMvc = MockMvcBuilders.standaloneSetup(controller)
-            .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
-            .setViewResolvers((viewName, locale) -> new MappingJackson2JsonView())
-            .build();
-}
-```
-
-Agora o método de teste retornará uma instância subjacente da classe ``DispatcherServlet``, desta forma, informando o tipo de operação, ao passar o MockHttpServletRequestBuilder usando o método estático MockMvcRequestBuilders.post informando como parâmetro a constante declarada no início da classe, permite a criação de um pedido customizado. Este é passado ao método mockMVC.perform(), no qual ele é usado para criar um objeto MockHttpServletRequest que é usado para definir um ponto inicial para o teste.
-
-```java
-@Test
-void testWhenPOSTIsCalledThenAPersonShouldBeCreated() throws Exception {
-    PersonDTO personDTO = PersonBuilder.builder().build().toPersonDTO();
-    MessageResponseDTO messageResponseDTO = createInspectMessageResponse(personDTO.getId());
-
-    when(service.registerPerson(personDTO)).thenReturn(messageResponseDTO);
-
-    mockMvc.perform(post(URL_PATH)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(jsonToString(personDTO)))
-            .andExpect(status().isCreated())
-            .andExpect(jsonPath("$.message", is(messageResponseDTO.getMessage())));
-}
-```
-
-Também foi passado para o objeto MockMvc o tipo de conteúdo (*Content Type*) a ser retornado, e para tratar o objeto DTO a fim de ser compatível com o Content Type é utilizado o método ``jsonToString`` criado para realizar a conversão necessária, por fim, é específicado o tipo de estado (*MockMvcResultMatchers*) e o retorno aguardado pelo endpoint.
-
-O método mockMvc.perform() retorna um objeto do tipo *ResultAction*, é um objeto utilizado para assegurar o resultado do teste, similar a forma usada pelo método ``assertEquals`` do JUnit. Desta maneira, é possível realizar a checagem do status HTTP, este caso o retorno OK (HTTP.200), e que a próxima view será “signin”.
 
 ## A Hospedagem na Plataforma Heroku
 Para hospedar nosso código na plataforma **Heroḱu** é necessário criar uma conta e atrelá-la a conta no **GitHub**, desta forma, ao logar no *Dashboard* do Heroku é criado um novo aplicativo apontando a conta do GitHub informando o nome do repositório em que está o projeto. Além disso, é habilitado a opção de *deploy* automático, para que todas as vezes que for realizado um *PUSH* para o repositório seja realizado o deploy da aplicação.
