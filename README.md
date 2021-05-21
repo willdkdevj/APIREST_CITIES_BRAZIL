@@ -34,7 +34,7 @@ Os frameworks são pacotes de códigos prontos que facilita o desenvolvimento de
 | Swagger         | 2.9.2  | Possibilita a definição e a criação de modo estruturado a documentação de API REST                | 
 
 ### Utilizando Docker para Disponibilizar o PostgreSQL
-
+Pode ser um Sistema de Gerenciamento de Banco de Dados (SGBD) PostgreSQL instalado na máquina, mas para o projeto foi utilizado um container Docker com o sistema encapsulado, na qual foi criada uma instância de banco de dados (uma *database*) passando seus parâmetros de configuração.escrito em YAML (acrônimo recursivo para YAML Ain’t Markup Language) é um formato de codificação de dados legíveis por humanos, o que torna fácil de ler e entender o que um Compose faz!
 
 ## Utilizando o Pageable para Paginação de Grandes Volumes de Dados
 A paginação é utilizida ao realizar uma requisição de consulta a um grande volume de dados, ela possibilita filtrar a quantidade de registros que serão retornados informando mais parâmetros que funcionam como filtros especificos para a *Query*. Desta forma, é possível restringir a quantidade de registros que serão apresentados por intervalo de páginas. É possível realizar estes "filtros" na própria query, mas a paginação permite que seja passado como parâmetro da própria **URI** utilizando os recursos do Spring Data, através da dependência ``spring-boot-starter-data-jpa``.
@@ -69,6 +69,7 @@ Assim como, direto na **URI** conforme é apresentado na imagem, através da fer
 ![Request GET - ListAll](https://github.com/willdkdevj/assets/blob/main/Heroku/deploy_heroku_person.png)
 
 ## Utilizando Cálculos para Retornar a Distância entre Dois Pontos
+Umas das funções da API é retornar a distância entre dois pontos para obter seu valor em **Milhas** e **Metros**, o cálculo da distância entre dois pontos no espaço é um assunto discutido na *Geometria Analítica* e tem suas bases no teorema de Pitágoras. A distância entre dois pontos no espaço é o comprimento do menor segmento de reta que liga esses dois pontos, para isso, é necessário calcular antes a distância entre dois pontos no plano. 
 
 ### Habilitando Extensões para Uso de Funções do PostgreSQL para Geolocalização
 Para demonstrar como foi realizado o uso do conceito TDD com o framework abaixo vou apresentar o que foi realizado para construção do método registerPerson() na classe de ``Service`` MVC. Mas conforme foi explanado anteriormente, foi necessário criar objetos para simular as classes em entidades com dados estáticos para emular entradas de informações aos objetos com classes construtoras (*builders*), que se trata de classes com valores estáticos para seus atributos, seguindo os conceitos do DTO. E para realizar esta conversão de uma classe DTO em uma entidade, foi utilizado o framework ``MapStruct``. Ele simplifica o mapeamento de objetos DTO para objetos de Entidade permitindo gerar código com base em uma abordagem de conversão utilizando uma interface.
@@ -131,7 +132,7 @@ Desta forma, em ``given`` é o que parâmetro fornecido ao método, que recebe u
 
 Este processo de verificação é realizado para testar os returnos esperados pela aplicação, assim como, as eventuais exceções a serem tratadas para devolutiva ao usuário.  
 
-### A Implementação dos Testes na Classe Controller
+### Desenvolvimento de Lógica para Cálculo de Distância
 
 
 ## A Hospedagem na Plataforma Heroku
