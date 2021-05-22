@@ -3,6 +3,7 @@
 
 [![Spring Badge](https://img.shields.io/badge/-Spring-brightgreen?style=flat-square&logo=Spring&logoColor=white&link=https://spring.io/)](https://spring.io/)
 [![Maven Badge](https://img.shields.io/badge/-Maven-000?style=flat-square&logo=Apache-Maven&logoColor=white&link=https://maven.apache.org/)](https://maven.apache.org/)
+[![Docker Badge](https://img.shields.io/badge/-Docker-information?style=flat-square&logo=Docker&logoColor=white&link=https://www.docker.com/products/docker-hub/)](https://www.docker.com/products/docker-hub/)
 [![PostgreSQL Badge](https://img.shields.io/badge/-PostgreSQL-blue?style=flat-square&logo=PostgreSQL&logoColor=white&link=https://www.postgresql.org/)](https://www.postgresql.org/)
 [![Heroku Badge](https://img.shields.io/badge/-Heroku-blueviolet?style=flat-square&logo=Heroku&logoColor=white&link=https://id.heroku.com/)](https://id.heroku.com/)
 
@@ -34,7 +35,14 @@ Os frameworks são pacotes de códigos prontos que facilita o desenvolvimento de
 | Swagger         | 2.9.2  | Possibilita a definição e a criação de modo estruturado a documentação de API REST                | 
 
 ### Utilizando Docker para Disponibilizar o PostgreSQL
-Pode ser um Sistema de Gerenciamento de Banco de Dados (SGBD) PostgreSQL instalado na máquina, mas para o projeto foi utilizado um container Docker com o sistema encapsulado, na qual foi criada uma instância de banco de dados (uma *database*) passando seus parâmetros de configuração.escrito em YAML (acrônimo recursivo para YAML Ain’t Markup Language) é um formato de codificação de dados legíveis por humanos, o que torna fácil de ler e entender o que um Compose faz!
+Pode ser um Sistema de Gerenciamento de Banco de Dados (SGBD) PostgreSQL instalado na máquina, mas para o projeto foi construído um container Docker personalizado (através de um *Dockerfile*) com o sistema encapsulado, na qual ao executá-lo, é criado uma database já com todas as tabelas necessárias para utilizar na API. Mas caso exista um SGBD PostgreSQL instalado no host, no diretório ``docker/scriptSQL`` estão scripts SQL para serem executados no sistema.
+
+Para utilizar o SGBD através do Docker digite o *snippet* abaixo para configurar o container e deixá-lo apto para uso da API.
+```sh
+docker run --name postgres-cities -d -p 5432:5432 -e POSTGRES_USER=postgres_supernova_user  -e POSTGRES_PASSWORD=supernova_pass -e POSTGRES_DB=citiesBrazil willdkdev/postgres-cities:latest
+```
+
+O comando run tentará encontrar a imagem no repositório local, onde não encontrará, desta forma, ele acessará o Docker Hub para encontrar e baixar a imagem **postgres-cities**, fornendo uma *alias* para invocá-lo ao invés de utilizar o container ID. Também é exposta a porta 5432 atrelando-a a porta de mesmo número no host, além disso, são fornecidas variáveis (enviroment (-e)) para passar os parãmetros (usuário, senha, database) para configuração do PostgreSQL. Enquanto o parâmetro willdkdev/postgres-cities:latest referente ao proprietário, imagem e versão.
 
 ## Utilizando o Pageable para Paginação de Grandes Volumes de Dados
 A paginação é utilizida ao realizar uma requisição de consulta a um grande volume de dados, ela possibilita filtrar a quantidade de registros que serão retornados informando mais parâmetros que funcionam como filtros especificos para a *Query*. Desta forma, é possível restringir a quantidade de registros que serão apresentados por intervalo de páginas. É possível realizar estes "filtros" na própria query, mas a paginação permite que seja passado como parâmetro da própria **URI** utilizando os recursos do Spring Data, através da dependência ``spring-boot-starter-data-jpa``.
