@@ -3,8 +3,8 @@
 
 [![Spring Badge](https://img.shields.io/badge/-Spring-brightgreen?style=flat-square&logo=Spring&logoColor=white&link=https://spring.io/)](https://spring.io/)
 [![Maven Badge](https://img.shields.io/badge/-Maven-000?style=flat-square&logo=Apache-Maven&logoColor=white&link=https://maven.apache.org/)](https://maven.apache.org/)
-[![Docker Badge](https://img.shields.io/badge/-Docker-information?style=flat-square&logo=Docker&logoColor=white&link=https://www.docker.com/products/docker-hub/)](https://www.docker.com/products/docker-hub/)
-[![PostgreSQL Badge](https://img.shields.io/badge/-PostgreSQL-blue?style=flat-square&logo=PostgreSQL&logoColor=white&link=https://www.postgresql.org/)](https://www.postgresql.org/)
+[![Docker Badge](https://img.shields.io/badge/-Docker-blue?style=flat-square&logo=Docker&logoColor=white&link=https://www.docker.com/products/docker-hub/)](https://www.docker.com/products/docker-hub/)
+[![PostgreSQL Badge](https://img.shields.io/badge/-PostgreSQL-informational?style=flat-square&logo=PostgreSQL&logoColor=white&link=https://www.postgresql.org/)](https://www.postgresql.org/)
 [![Heroku Badge](https://img.shields.io/badge/-Heroku-blueviolet?style=flat-square&logo=Heroku&logoColor=white&link=https://id.heroku.com/)](https://id.heroku.com/)
 
 
@@ -49,11 +49,13 @@ A paginação é utilizida ao realizar uma requisição de consulta a um grande 
 
 Agora, se faz necessário que a interface *Repository* extenda a também interface JpaRepository. Pois a interface JpaRepository também extende a **PagingAndSortingRepository**, sendo ela que possibilita interpretar o **Pageable** recebido por parâmetro através de um *Resource* utilizando o tipo de requisição GET, desta forma, utilizando as vantagens do fator de multi-herança.
 ```java
-@GetMapping("/users")
-public ResponseEntity execute(Pageable page){
-    return ResponseEntity.ok(service.execute(page));
-}
+@GetMapping("/cities")
+  public Page<City> searchForCities(final Pageable page) {
+      return serviceCity.returnCatalogCities(page);
+  }
 ```
+
+![Pageable - ListAll](https://github.com/willdkdevj/assets/blob/main/Spring/api-cities-list.png)
 
 Também é possível passar parâmetros padrões (*default*) a fim de serem aplicados assim que o *resouce* é invocado, ao utilizar a anotação **@PageableDefault**. Para isso, se faz necessário passar alguns atributos para sua validação, são eles:
 * **Page** - identifica qual a página a ser retornada de uma lista;
@@ -61,20 +63,20 @@ Também é possível passar parâmetros padrões (*default*) a fim de serem apli
 * **Sort** - define a ordenação dos registros através do nome do campo;
 * **Direction** - define o tipo de ordenação a ser aplicada a paginação (Crescente (ASC) / Decrescente (DESC)).
 ```java
-@GetMapping("/users")
-  public ResponseEntity execute(
+@GetMapping("/cities")
+  public ResponseEntity searchForCities(
          @PageableDefault(sort = "name",
                  direction = Sort.Direction.ASC,
                  page = 0,
                  size = 10) Pageable page){
 
-      return ResponseEntity.ok(service.execute(page));
+      return ResponseEntity.ok(serviceCity.returnCatalogCities(page));
   }
 ```
 
 Assim como, direto na **URI** conforme é apresentado na imagem, através da ferramenta Insomnia que apresenta uma requisição do tipo GET.
 
-![Request GET - ListAll](https://github.com/willdkdevj/assets/blob/main/Heroku/deploy_heroku_person.png)
+![PageableDefault - ListAll](https://github.com/willdkdevj/assets/blob/main/Spring/api-cities-list-param.png)
 
 ## Utilizando Cálculos para Retornar a Distância entre Dois Pontos
 Umas das funções da API é retornar a distância entre dois pontos para obter seu valor em **Milhas** e **Metros**, o cálculo da distância entre dois pontos no espaço é um assunto discutido na *Geometria Analítica* e tem suas bases no teorema de Pitágoras. A distância entre dois pontos no espaço é o comprimento do menor segmento de reta que liga esses dois pontos, para isso, é necessário calcular antes a distância entre dois pontos no plano. 
