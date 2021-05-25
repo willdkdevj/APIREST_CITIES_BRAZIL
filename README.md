@@ -30,7 +30,7 @@ Os frameworks são pacotes de códigos prontos que facilita o desenvolvimento de
 | Hibernate       | 6.1.7  | Permite automatizar as tarefas com o banco de dados facilitando o código da aplicação             |
 | Lombok          | 1.18.18| Permite reduzir a verbosidade do código através de anotações                                      |
 | MapStruct       | 1.4.1  | Permite o mapeamento entre bean Java com base de uma abordagem de conversão sobre configuração    |
-| JUnit 	      | 5.7.1  | Permite a realização de testes unitários de componentes da aplicação Java                         |
+| JUnit 	        | 5.7.1  | Permite a realização de testes unitários de componentes da aplicação Java                         |
 | Mockito         | 3.6.28 | Permite criar objetos dublês a fim de realizar testes de unidade em aplicações Java               |
 | Swagger         | 2.9.2  | Possibilita a definição e a criação de modo estruturado a documentação de API REST                | 
 
@@ -38,7 +38,7 @@ Os frameworks são pacotes de códigos prontos que facilita o desenvolvimento de
 Pode ser um Sistema de Gerenciamento de Banco de Dados (SGBD) PostgreSQL instalado na máquina, mas para o projeto foi construído um container Docker personalizado (através de um *Dockerfile*) com o sistema encapsulado, na qual ao executá-lo, é criado uma database já com todas as tabelas necessárias para utilizar na API. Mas caso exista um SGBD PostgreSQL instalado no host, no diretório ``docker/scriptSQL`` estão scripts SQL para serem executados no sistema.
 
 Para utilizar o SGBD através do Docker digite o *snippet* abaixo para configurar o container e deixá-lo apto para uso da API.
-```sh
+```bash
 docker run --name postgres-cities -d -p 5432:5432 -e POSTGRES_USER=postgres_supernova_user  -e POSTGRES_PASSWORD=supernova_pass -e POSTGRES_DB=citiesBrazil willdkdev/postgres-cities:latest
 ```
 
@@ -82,67 +82,116 @@ Assim como, direto na **URI** conforme é apresentado na imagem, através da fer
 Umas das funções da API é retornar a distância entre dois pontos para obter seu valor em **Milhas** e **Metros**, o cálculo da distância entre dois pontos no espaço é um assunto discutido na *Geometria Analítica* e tem suas bases no teorema de Pitágoras. A distância entre dois pontos no espaço é o comprimento do menor segmento de reta que liga esses dois pontos, para isso, é necessário calcular antes a distância entre dois pontos no plano. 
 
 ### Habilitando Extensões para Uso de Funções do PostgreSQL para Geolocalização
-Para demonstrar como foi realizado o uso do conceito TDD com o framework abaixo vou apresentar o que foi realizado para construção do método registerPerson() na classe de ``Service`` MVC. Mas conforme foi explanado anteriormente, foi necessário criar objetos para simular as classes em entidades com dados estáticos para emular entradas de informações aos objetos com classes construtoras (*builders*), que se trata de classes com valores estáticos para seus atributos, seguindo os conceitos do DTO. E para realizar esta conversão de uma classe DTO em uma entidade, foi utilizado o framework ``MapStruct``. Ele simplifica o mapeamento de objetos DTO para objetos de Entidade permitindo gerar código com base em uma abordagem de conversão utilizando uma interface.
+Além do uso de cálculo para encontrarmos a distância entre dois pontos, na tabela **cidade** temos o atributo *lat_lon* que é do tipo Point, este atribuito em especial permite inserir valores para passagem de parâmetros de localização, conhecidos como pontos, através deles é possível para determinar a geolocalização. Geolocalização é um recurso que permite determinar a posição geográfica de um individuo com base em um sistema de coordenadas.
 
-Para realizar esta abordagem é utilizada a anotação @Mapper na interface que mapeia quais são os objetos a serem convertidos atraves da sobreescritas de seus métodos.
+O PostgreSQL possui suporte para trabalhar com *Geolocalização* ao habilitar extensões especificas do SGBD para permitir que ele reconheça este tipo de atributo e suas funções para realizar cálculos a partir dos mesmos. Estas extensões já estão habilitadas em nosso container Docker ao criarmos uma instância no daemon. Elas também estão presentes no script ``3_cidade.sql``, caso tenha o SGBD instalado no host e deseja utilizá-lo. Abaixo segue os snippet's responsável por habilitá-los.
+```sql
+CREATE EXTENSION cube;
+CREATE EXTENSION earthdistance;
+```
+A partir destas extensões podemos invocar funções e operadores do próprio PostgreSQL para realizarmos o cálculo de distância entre dos pontos, onde uma delas é a função distanceByPoints(), na qual podemos invocá-la em nosso serviço graças a **JPA Data**. O retorno deste método é em *milhas*.
+```java
+public MessageResponse distanceByLocationInMilesPostgre(String city1, String city2) throws UrbeNotFoundException {
+    City foundCity1 = checkedCityByName(city1);
+    City foundCity2 = checkedCityByName(city2);
+
+    Double obtainedDistance = repository.distanceByPoints(foundCity1.getId(), foundCity2.getId());
+
+    return createMessageResponse(obtainedDistance, "The distance in miles obtained by PostgreSQL between the two points is: ");
+}
+```
+Já a função *Cube* permite o uso do método distanceByCube(), que permite passarmos dois pontos de geolocalização que constite na passagem de latitude e longitude de dois pontos, onde é obtida o retorno da distância entre estes dois pontos em *metros*.
 
 ```java
-@Mapper
-public interface PersonMapper {
+public MessageResponse distanceInMetersPostgre(String city1, String city2) throws UrbeNotFoundException {
+    City foundCity1 = checkedCityByName(city1);
+    City foundCity2 = checkedCityByName(city2);
 
-    PersonMapper INSTANCE = Mappers.getMapper(PersonMapper.class);
+    Point point1 = foundCity1.getLocation();
+    Point point2 = foundCity2.getLocation();
 
-    @Mapping(target = "birthDate", source = "birthDate", dateFormat = "dd-MM-yyyy")
-    Person toModel(PersonDTO personDTO);
+    Double obtainedDistance = repository.distanceByCube(point1.getX(), point1.getY(),
+                                                        point2.getX(), point2.getY());
 
-    PersonDTO toDTO(Person person);
+    return createMessageResponse(obtainedDistance, "The distance in meters obtained by PostgreSQL between the two points is: ");
 }
 ```
 
-Neste caso especifico, foi necessário informar ao MapStruct que tipo de dado o objeto DTO está passando para o objeto Bean, que neste caso, é um atríbuto LocalDate, enquanto o DTO é uma String. Desta forma, a anotação @Mapping atrela estes campos distintos informando o formato do dado.
-
-Agora que está esclarecido como os dados dos objetos serão utilizados pelos testes e seus objetos mocados, vamos para a clase de teste de Serviço (**Service**). Antes de mais nada, foi anotada a classe de teste com a anotação @ExtendWith(MockitoExtension.class) que injeta nesta classe a biblioteca do ``Mockito`` a fim de permitir *mocar* objetos em nossa classe utilizando mais duas anotações @Mock e @InjectMocks. O objetivo de mocar objetos é criar objetos dublês que simulam o comportamento de objetos reais de forma controlada.
-
-```java
-@ExtendWith(MockitoExtension.class)
-public class PersonServiceTest {
-
-    private PersonMapper mapper = PersonMapper.INSTANCE;
-
-    @Mock
-    private PersonRepository repository;
-
-    @InjectMocks
-    private PersonService service;
-
-```
-
-Observe que "mocamos" objetos PersonRepository e PersonService para inserirmos no contexto da classe de teste Mockito, além disso, criamos uma instância constante de Mapper através do PersonMapper, para realizarmos a conversão de objetos a serem utilizados nos testes utilizando de suas facilidades de já instanciar os objetos e atribuir valores aos seus atríbutos.
-
-Agora, depois de todos estes passos, vamos ao método registerPerson() para realizar o teste inicial. O conceito do TDD preconiza que o teste tem que falhar antes de realizar a construção lógica para tentar validá-lo. Desta forma, foi criado o método testPersonDTOProvidedThenReturnSavedMessage() na qual é anotado com @Test a fim de informar que é um método de teste ao JUnit e executamos sem implementação alguma, só para ocorrer a falha. Depois foi implementado o código com a lógica necessária para fazê-lo passar. E finalmente, o mesmo é refatorado a fim de torná-lo mais "limpo", deixando-o mais legível.
-
-```java
-	@Test
-    void testPersonDTOProvidedThenReturnSavedMessage() {
-    	// given
-        PersonDTO personDTO = PersonDTO.builder().build().toPersonDTO();
-        Person convertedPerson = mapper.toModel(personDTO);
-
-        // When
-        when(repository.save(any(Person.class))).thenReturn(convertedPerson);
-
-        // Then
-        MessageResponseDTO expectedSuccessMessage = service.registerPerson(personDTO);
-        MessageResponseDTO expectedSuccessMessageID = createInspectMessageResponse(convertedPerson.getId());
-
-        assertEquals(expectedSuccessMessageID, expectedSuccessMessage);
-    }
-```
-Desta forma, em ``given`` é o que parâmetro fornecido ao método, que recebe um objeto do tipo PersonDTO, e o que é retornado após a invocação do método da JPA para salvar o conteúdo presente no objeto em ``when``, que no caso o método save() recebe um Bean convertido do DTO e retorna novamente um Bean do objeto passado. Na qual em ``then`` é realizado a contraprova ao checar os objetos retornados ao invocar o método através do objeto mocado de Service (service.registerPerson()), em comparação com uma Classe de Construção para testes (MessageBuilder) a fim confirmar se a resposta serão iguais, confirmadas através do método do JUnit **assertEquals**.
-
-Este processo de verificação é realizado para testar os returnos esperados pela aplicação, assim como, as eventuais exceções a serem tratadas para devolutiva ao usuário.  
-
 ### Desenvolvimento de Lógica para Cálculo de Distância
+Através da circunferência terrestre é possível passar ao raio da Terra (por meio de medidas de distância) assim como Eratóstenes fez para realizar o cálculo entre Siena e Alexandria, mas com muito mais recursos que ele teve. Para isso, foi utilizado a trigonometria para realizar o cálculo do **Seno** e o **Cosseno** referente a *latitude* e *longitude* dos pontos, sobreponduas para retornar a distância entre as mesmas.
+
+Eratóstenes calculou o raio da Terra com uma margem de erro de centímetros há mais de 2.000 anos atrás só com uma estaca como ferramenta de trabalho. *Eratóstenes de Cirene* (**Eratosthéni̱s; Cirene, 276 a.C. — Alexandria, 194 a.C.**) foi além de matemático, gramático, poeta, geógrafo, bibliotecário e astrônomo da Grécia Antiga. Nasceu em Cirene, na África, e morreu em Alexandria. 
+Já nós conseguimos estas medidas facilmente utilizando o *Google*, desta forma, através desta ferramentas foram obtidas as medidas em metros, kilometros e milhas, e criado um ``Enum`` para criarmos constantes com estes valores.
+```java
+@Getter
+@AllArgsConstructor
+public enum EarthRadius {
+    METERS("m", 6371182f),
+    KILOMETERS("km", 6371.182f),
+    MILES("mi",3963.799824f);
+
+    private String unit;
+    private Float value;
+}
+```
+
+Quanto a lógica utilizada para o cálculo, o método distanceByLocationByRadius() recebe como parâmetros o nome de duas cidades e qual o tipo de medida, referente ao raio da Terra, deve ser retornado ao solicitante. Ele realiza a checagem se existem as cidades informadas como parâmetro e obtem suas coordenadas (latitude e longitude) invocando um segundo método (*convertGeo()*) que são convertidas como números flutuantes, desta maneira, é repassado para um terceiro método, onde este tem a propriedade de realizar o cálculo com as latitudes e longitudes obtidas, além do tipo de medida para determinar o tipo de distância.
+```java
+/*
+ * METHOD INVOKED BY THE CONTROLLER: This method receives the names of two cities plus the type of measurement
+ * through the Earth's radius, which checks the existence of the cities in the database and converts the location
+ * into a double to perform the calculation.
+ */
+public MessageResponse distanceByLocationByRadius(String city1, String city2, EarthRadius radius)
+            throws UrbeNotFoundException {
+    City foundCity1 = checkedCityByName(city1);
+    City foundCity2 = checkedCityByName(city2);
+
+    List<City> cities = repository.findAllById(Arrays.asList(foundCity1.getId(),
+                                                             foundCity2.getId()));
+
+    Double[] location1 = convertGeo(cities.get(0).getGeolocation());
+    Double[] location2 = convertGeo(cities.get(1).getGeolocation());
+
+    Double obtainedDistance = calculateDistance(location1[0],
+                                                location1[1],
+                                                location2[0],
+                                                location2[1], radius);
+
+    MessageResponse message = createMessageResponse(obtainedDistance, "The distance between the two points is: ");
+    message.setMessage(message.getMessage() + " " + radius.getUnit());
+
+    return message;
+}
+
+/* 
+ * RESPONSIBLE METHOD OF CONVERTING LOCATION: This method takes the location as a string and converts it into two 
+ * double parameters, which are the location points of the city.
+ */
+private Double[] convertGeo(String value){
+    String obtainedString = value.replace("(", "")
+                                 .replace(")", "");
+    String[] values = obtainedString.trim().split(",");
+    return new Double[] {Double.valueOf(values[0]), Double.valueOf(values[1])};
+}
+
+/*
+ * METHOD RESPONSIBLE FOR PERFORMING THE CALCULATION: This method takes as a parameter the latitudes and longitude 
+ * of two cities and the radius of the Earth, which can be passed as Miles, Kilometers or Meters.
+ */
+private Double calculateDistance(Double latitude1, Double longitude1,
+                                 Double latitude2, Double longitude2, EarthRadius radius){
+    Double differenceBetweenLatitudes = toRadians(latitude2 - latitude1);
+    Double differenceBetweenLongitudes = toRadians(longitude2 - longitude1);
+    Double obtainedArea = sin(differenceBetweenLatitudes / 2) * sin(differenceBetweenLatitudes / 2) +
+                          cos(toRadians(latitude1)) * cos(toRadians(latitude2)) * sin(differenceBetweenLongitudes /2) * sin(differenceBetweenLongitudes / 2);
+    Double factor = 2 * atan2(sqrt(obtainedArea), sqrt(1 - obtainedArea));
+
+    return radius.getValue() * factor;
+}
+```
+### Tirando a Contra-Prova com o Google Maps
+Não tenho ideia como o Google cálcula a distância entre dois pontos, mas utilizaremos a API e seus métodos para compararmos os retornos obtidos pelos cálculos realizados por ela em comparação com a do PostgreSQL.
 
 
 ## A Hospedagem na Plataforma Heroku
