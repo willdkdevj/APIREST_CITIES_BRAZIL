@@ -91,13 +91,15 @@ CREATE EXTENSION earthdistance;
 ```
 A partir destas extensões podemos invocar funções e operadores do próprio PostgreSQL para realizarmos o cálculo de distância entre dos pontos, onde uma delas é a função distanceByPoints(), na qual podemos invocá-la em nosso serviço graças a **JPA Data**. O retorno deste método é em *milhas*.
 ```java
-public MessageResponse distanceByLocationInMilesPostgre(String city1, String city2) throws UrbeNotFoundException {
+public MessageResponse distanceByLocationInMilesPostgre(String city1, String city2) 
+                                                        throws UrbeNotFoundException {
     City foundCity1 = checkedCityByName(city1);
     City foundCity2 = checkedCityByName(city2);
 
     Double obtainedDistance = repository.distanceByPoints(foundCity1.getId(), foundCity2.getId());
 
-    return createMessageResponse(obtainedDistance, "The distance in miles obtained by PostgreSQL between the two points is: ");
+    return createMessageResponse(obtainedDistance, 
+                      "The distance in miles obtained by PostgreSQL between the two points is: ");
 }
 ```
 
@@ -106,7 +108,8 @@ public MessageResponse distanceByLocationInMilesPostgre(String city1, String cit
 Já a função *Cube* permite o uso do método distanceByCube(), que permite passarmos dois pontos de geolocalização que constite na passagem de latitude e longitude de dois pontos, onde é obtida o retorno da distância entre estes dois pontos em *metros*.
 
 ```java
-public MessageResponse distanceInMetersPostgre(String city1, String city2) throws UrbeNotFoundException {
+public MessageResponse distanceInMetersPostgre(String city1, String city2) 
+                                               throws UrbeNotFoundException {
     City foundCity1 = checkedCityByName(city1);
     City foundCity2 = checkedCityByName(city2);
 
@@ -116,7 +119,8 @@ public MessageResponse distanceInMetersPostgre(String city1, String city2) throw
     Double obtainedDistance = repository.distanceByCube(point1.getX(), point1.getY(),
                                                         point2.getX(), point2.getY());
 
-    return createMessageResponse(obtainedDistance, "The distance in meters obtained by PostgreSQL between the two points is: ");
+    return createMessageResponse(obtainedDistance,
+                      "The distance in meters obtained by PostgreSQL between the two points is: ");
 }
 ```
 
@@ -203,18 +207,29 @@ Não tenho ideia como o Google cálcula a distância entre dois pontos, mas util
 
 Como foi apresentado nas imagens que apresentam o retorno dos cálculos de cada método, utilizamos para análise as cidades de Atibaia e Guarulhos, ambas do estado de São Paulo. No Google Maps passamos as coordenadas (*geolocation*) obtidas no consultá-las em nossa API, desta forma obtemos os seguintes resultados.
 
-A imagem abaixo apresenta o resultado obtido da cidade de Atibaia - SP.
 ![Atibaia City](https://github.com/willdkdevj/assets/blob/main/Spring/api-citiesBrazil/maps-Atibaia.png)
+> A imagem abaixo apresenta o resultado obtido da cidade de Atibaia - SP.
 
-A imagem abaixo apresenta o resultado obtido da cidade de Guarulhos - SP.
 ![Guarulhos City](https://github.com/willdkdevj/assets/blob/main/Spring/api-citiesBrazil/maps-Guarulhos.png)
+> A imagem abaixo apresenta o resultado obtido da cidade de Guarulhos - SP.
 
 Depois aplicamos para que fosse feita o cálculo de distância entre as duas cidades, na qual por padrão, ele assume como premissa um meio de locomoção entre vias de tráfego possível para se chegar ao destino, deste exemplo foi utilizado um veículo.
 
 ![Google Maps](https://github.com/willdkdevj/assets/blob/main/Spring/api-citiesBrazil/between-cities.png)
 
-Mas foi utilizado um recurso no Google Maps que permite traçarmos uma reta entre estes dois pontos para obtermos qual a distância entre dois pontos em uma reta. Sendo esta a aritmética aplicada em nosso cálculo para determinar a distância entre os polos.
+Mas foi utilizado um recurso no Google Maps que permite traçarmos uma reta entre estes dois pontos para obtermos qual a distância entre dois pontos em uma reta. Sendo esta a aritmética aplicada em nosso cálculo para determinar a distância entre os polos. Note que abaixo é apresentado um *Card*, nele é apresentado os valores obtidos pela reta traçada. 
 
+Na tabela abaixo são apresentados os resultados obtidos por cada aplicação:
+
+|                     | Kilometros | Milhas |
+|---------------------|------------|--------|
+| Google Maps         | 37,90km    | 23,55mi|
+| Function PostgreSQL | 37,55km    | 16,08mi|
+| Logic REST API      | 37,51km    | 23,33mi|
+
+Para obtermos paridade entre as comparações convertemos a saída obtida pela função PostgreSQL ``distanceByCube``, pois ela retorna o retorno em metros, desta forma, dividimos o valor por 1000 que corresponde a quantidade de metros que há em um Kilometro. Já com a função ``distanceByPoints`` não foi necessária realizar esta medida pois ela retorna o valor em milhas.
+
+Por fim, podemos notar que a diferença entre as aplicações é mínima, na qual pode ser que o valor do *raio* da Terra aplicado para o cálculo tenha diferença de décimos, ocasionando esta disparidade.
 
 ## A Hospedagem na Plataforma Heroku
 Para hospedar nosso código na plataforma **Heroḱu** é necessário criar uma conta e atrelá-la a conta no **GitHub**, desta forma, ao logar no *Dashboard* do Heroku é criado um novo aplicativo apontando a conta do GitHub informando o nome do repositório em que está o projeto. Além disso, é habilitado a opção de *deploy* automático, para que todas as vezes que for realizado um *PUSH* para o repositório seja realizado o deploy da aplicação.
