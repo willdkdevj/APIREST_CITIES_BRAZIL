@@ -55,7 +55,7 @@ Agora, se faz necessário que a interface *Repository* extenda a também interfa
   }
 ```
 
-![Pageable - ListAll](https://github.com/willdkdevj/assets/blob/main/Spring/api-cities-list.png)
+![Pageable - ListAll](https://github.com/willdkdevj/assets/blob/main/Spring/api-citiesBrazil/api-cities-list.png)
 
 Também é possível passar parâmetros padrões (*default*) a fim de serem aplicados assim que o *resouce* é invocado, ao utilizar a anotação **@PageableDefault**. Para isso, se faz necessário passar alguns atributos para sua validação, são eles:
 * **Page** - identifica qual a página a ser retornada de uma lista;
@@ -76,7 +76,7 @@ Também é possível passar parâmetros padrões (*default*) a fim de serem apli
 
 Assim como, direto na **URI** conforme é apresentado na imagem, através da ferramenta Insomnia que apresenta uma requisição do tipo GET.
 
-![PageableDefault - ListAll](https://github.com/willdkdevj/assets/blob/main/Spring/api-cities-list-param.png)
+![PageableDefault - ListAll](https://github.com/willdkdevj/assets/blob/main/Spring/api-citiesBrazil/api-cities-list-param.png)
 
 ## Utilizando Cálculos para Retornar a Distância entre Dois Pontos
 Umas das funções da API é retornar a distância entre dois pontos para obter seu valor em **Milhas** e **Metros**, o cálculo da distância entre dois pontos no espaço é um assunto discutido na *Geometria Analítica* e tem suas bases no teorema de Pitágoras. A distância entre dois pontos no espaço é o comprimento do menor segmento de reta que liga esses dois pontos, para isso, é necessário calcular antes a distância entre dois pontos no plano. 
@@ -100,6 +100,9 @@ public MessageResponse distanceByLocationInMilesPostgre(String city1, String cit
     return createMessageResponse(obtainedDistance, "The distance in miles obtained by PostgreSQL between the two points is: ");
 }
 ```
+
+![DistanceByPoints - CityLocation](https://github.com/willdkdevj/assets/blob/main/Spring/api-citiesBrazil/distance-in-miles.png)
+
 Já a função *Cube* permite o uso do método distanceByCube(), que permite passarmos dois pontos de geolocalização que constite na passagem de latitude e longitude de dois pontos, onde é obtida o retorno da distância entre estes dois pontos em *metros*.
 
 ```java
@@ -116,6 +119,8 @@ public MessageResponse distanceInMetersPostgre(String city1, String city2) throw
     return createMessageResponse(obtainedDistance, "The distance in meters obtained by PostgreSQL between the two points is: ");
 }
 ```
+
+![PageableDefault - ListAll](https://github.com/willdkdevj/assets/blob/main/Spring/api-citiesBrazil/distance-in-meters.png)
 
 ### Desenvolvimento de Lógica para Cálculo de Distância
 Através da circunferência terrestre é possível passar ao raio da Terra (por meio de medidas de distância) assim como Eratóstenes fez para realizar o cálculo entre Siena e Alexandria, mas com muito mais recursos que ele teve. Para isso, foi utilizado a trigonometria para realizar o cálculo do **Seno** e o **Cosseno** referente a *latitude* e *longitude* dos pontos, sobreponduas para retornar a distância entre as mesmas.
@@ -190,8 +195,25 @@ private Double calculateDistance(Double latitude1, Double longitude1,
     return radius.getValue() * factor;
 }
 ```
+
+![Distance Calculation](https://github.com/willdkdevj/assets/blob/main/Spring/api-citiesBrazil/distance-calculation-kilo.png)
+
 ### Tirando a Contra-Prova com o Google Maps
-Não tenho ideia como o Google cálcula a distância entre dois pontos, mas utilizaremos a API e seus métodos para compararmos os retornos obtidos pelos cálculos realizados por ela em comparação com a do PostgreSQL.
+Não tenho ideia como o Google cálcula a distância entre dois pontos, mas utilizaremos a API e seus métodos para compararmos os retornos obtidos por ela e também comparar os retornos obtidos pelas funções do PostgreSQL.
+
+Como foi apresentado nas imagens que apresentam o retorno dos cálculos de cada método, utilizamos para análise as cidades de Atibaia e Guarulhos, ambas do estado de São Paulo. No Google Maps passamos as coordenadas (*geolocation*) obtidas no consultá-las em nossa API, desta forma obtemos os seguintes resultados.
+
+A imagem abaixo apresenta o resultado obtido da cidade de Atibaia - SP.
+![Atibaia City](https://github.com/willdkdevj/assets/blob/main/Spring/api-citiesBrazil/maps-Atibaia.png)
+
+A imagem abaixo apresenta o resultado obtido da cidade de Guarulhos - SP.
+![Guarulhos City](https://github.com/willdkdevj/assets/blob/main/Spring/api-citiesBrazil/maps-Guarulhos.png)
+
+Depois aplicamos para que fosse feita o cálculo de distância entre as duas cidades, na qual por padrão, ele assume como premissa um meio de locomoção entre vias de tráfego possível para se chegar ao destino, deste exemplo foi utilizado um veículo.
+
+![Google Maps](https://github.com/willdkdevj/assets/blob/main/Spring/api-citiesBrazil/between-cities.png)
+
+Mas foi utilizado um recurso no Google Maps que permite traçarmos uma reta entre estes dois pontos para obtermos qual a distância entre dois pontos em uma reta. Sendo esta a aritmética aplicada em nosso cálculo para determinar a distância entre os polos.
 
 
 ## A Hospedagem na Plataforma Heroku
